@@ -1,0 +1,185 @@
+
+package graph;
+
+import static graph.Main.A;
+import java.util.*;
+import java.io.*;
+class pairobject{
+    int x;
+    int y;
+
+    synchronized void  pair(int a,int b) {
+    this.x=a;
+    this.y=b;
+    }
+     synchronized int getx(){
+        return x;
+    }
+  synchronized  int gety(){
+   return y;
+   }
+}
+class G{
+    static Graph<Integer> g = new Graph<>();
+    ArrayList<Integer> a=new ArrayList<>();
+    ArrayList<Integer> Lo=new ArrayList<>();
+   synchronized void addedge(int i,int j){
+        g.addEdge(i, j, false);
+        a.add(i);
+    }
+    void ToString(){
+        System.out.println("Graph : "+ g.toString());
+        //System.err.println("!");
+    }
+    void Len(Graph g){
+      for(int i=0;i<7;i++){
+       int x=g.len(i);
+       Lo.add(x);
+      }
+    }
+    int maxLen(){
+     int ans=0;
+     if(Lo.size()>0){
+     int l=Collections.max(Lo);
+     for(int i:Lo){
+         if(i==l){
+          ans=Lo.indexOf(i);
+         }
+     }
+     Lo.remove(ans);
+     }
+     return ans;
+    }
+   
+    
+};
+
+/*class MultiThreading extends Thread{
+    
+  
+    
+    @Override
+    public void run(){
+    while(A.size()>0){
+    pairobject o=(A.get(0));
+    int k=o.getx();
+    int j=o.gety();
+    A.remove(0);
+    //g.addEdge(k,j,false);
+    } 
+    }
+}*/
+
+public  class Main{
+ static boolean visited[] = new boolean[5];
+   static ArrayList<pairobject> A=new ArrayList<>();
+  public static void main(String Args[]) throws IOException, InterruptedException{
+  pairobject[] p=new pairobject[7];
+  G K=new G();
+  Scanner scan=new Scanner(System.in);
+   for(int i=0;i<7;i++){
+   int a=scan.nextInt();
+   int b=scan.nextInt();
+   p[i] = new pairobject();
+   p[i].pair(a,b);
+A.add(p[i]);
+ }
+ System.out.println(K.maxLen());
+ Thread T1=new Thread(){
+ public void run(){
+  while(A.size()>0){
+    pairobject o=(A.get(0));
+    int k=o.getx();
+    int j=o.gety();
+    K.addedge(k, j);
+    if(A.size()>0)
+    A.remove(0);
+    //System.out.println(j+" T1");
+   
+ }
+ }
+ };
+  Thread T2=new Thread(){
+
+ public void run(){
+  while(A.size()>0){
+    pairobject o=(A.get(0));
+    int k=o.getx();
+    int j=o.gety();
+    K.addedge(k, j);
+    //System.out.println(j+" T2");
+    if(A.size()>0)
+    A.remove(0);
+   
+ }
+ }
+  };
+ T1.start();
+ T2.start();
+ T1.join();
+ T2.join();
+  
+ /*MultiThreading Thread1=new MultiThreading();
+ Thread1.start();
+ MultiThreading Thread2=new MultiThreading();
+ Thread2.start();*/
+
+       /* g.addEdge(0, 1,false); 
+        g.addEdge(0, 4,false); 
+        g.addEdge(1, 2,false); 
+        g.addEdge(1, 3,false); 
+        g.addEdge(1, 4,false); 
+        g.addEdge(2, 3,false); 
+        g.addEdge(3, 4,false);*/
+    //BFS(3,g);
+   
+   Thread T3= new Thread(){
+   public void run(){
+   BFS(1,K);
+   }
+  };
+  Thread T4= new Thread(){
+   public void run(){
+   BFS(2,K);
+   }
+  };
+  T3.start();
+  T4.start();
+  T1.join();
+  T2.join();
+  T3.join();
+  T4.join();
+  K.ToString();
+
+  }
+  
+  
+//DIRECTED GRAPH BFS 
+  public static synchronized void BFS(int s, Graph g){
+  LinkedList<Integer> queue=new LinkedList<>();
+ if(visited[s]!=true){
+  visited[s]=true; 
+  queue.add(s);
+   while (!queue.isEmpty()) 
+    { 
+        int k=queue.poll();
+        System.out.print(k + " ");
+        LinkedList<Integer> L=g.get(k);
+      for (int n : L) {
+          if (!visited[n])
+          {
+              visited[n] = true;
+              queue.add(n);
+          } 
+      }
+  }
+ } 
+ if(queue.isEmpty()){
+     for(int i=0;i<5;i++){
+     if(visited[i]!=true){
+         BFS(i,g);
+     }
+     }
+ }
+}
+}

@@ -1,0 +1,58 @@
+import java.io.*;
+import java.util.*;
+
+class Multithreading extends Thread
+{
+	int x,y,z,g;
+	Multithreading(int a, int b, int guess,int o){
+		this.x=a;
+		this.y=b;
+		this.z=guess;
+		this.g=o;
+	}
+	public void print(int g) {
+		System.out.println(g);
+		System.out.println(z);
+	}
+	int ans;
+	public void run() {
+		if(x==z) {
+			ans= x;
+		}
+		if(y==z) {
+			 ans=y;
+		}
+		else {
+			while(z!=ans) {
+				int random_int = (int)(Math.random() * (y - x + 1) + x);
+				if(random_int==z) {
+					print(g);
+					break;
+				}
+			}
+		}	
+		
+	}
+	
+}
+
+
+
+
+
+public class nonce {
+	public static void main(String[] args) {
+		Random rand=new Random();
+		int guess=rand.nextInt(40000);
+		Multithreading object = new Multithreading(0,10000,guess,1); 
+        	object.start();
+        Multithreading object1 = new Multithreading(10001,20000,guess,2); 
+        object1.start(); 
+        Multithreading object2 = new Multithreading(20001,300,guess,3); 
+        object2.start(); 
+        Multithreading object3 = new Multithreading(301,400,guess,4); 
+        object3.start(); 
+
+	}
+
+}

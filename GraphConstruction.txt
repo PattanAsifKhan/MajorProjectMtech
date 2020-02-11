@@ -1,0 +1,59 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package graph;
+
+import java.util.*;
+
+/**
+ *
+ * @author hp
+ * @param <T>
+ */
+public class Graph<T>{
+ private Map<T, List<T> > map = new HashMap<>(); 
+ public void addVertex(T s) 
+    { 
+        map.put(s, new LinkedList<>()); 
+    } 
+    public void addEdge(T source, 
+                        T destination, 
+                        boolean bidirectional) 
+    { 
+  
+        if (!map.containsKey(source)) 
+            addVertex(source); 
+  
+        if (!map.containsKey(destination)) 
+            addVertex(destination); 
+  
+        map.get(source).add(destination); 
+        if (bidirectional == true) { 
+            map.get(destination).add(source); 
+        } 
+    }
+   @Override
+    public String toString() 
+    { 
+        StringBuilder builder = new StringBuilder(); 
+  
+        for (T v : map.keySet()) { 
+            builder.append(v.toString()).append(": "); 
+            for (T w : map.get(v)) { 
+                builder.append(w.toString()).append(" "); 
+            } 
+            builder.append("\n"); 
+        } 
+  
+        return (builder.toString()); 
+    } 
+
+    LinkedList<Integer> get(T k) {
+        return (LinkedList<Integer>) map.get(k);
+    }
+    int len(int k){
+        return map.get(k).size();
+    }
+}
