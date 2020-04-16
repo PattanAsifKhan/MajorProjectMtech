@@ -1,12 +1,17 @@
-
-package graphdag;
-
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package graphdag1;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.*;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class Node1{
 
@@ -33,7 +38,7 @@ class Node1{
         return amount;
     }
 
-    public int getLock() {
+    public synchronized int getLock() {
         return lock;
     }
     String c;
@@ -50,7 +55,7 @@ class Node1{
         this.amount = amount;
     }
 
-    public void setLock(int lock) {
+    public synchronized void setLock(int lock) {
         this.lock = lock;
     }
     int incoming;
@@ -60,10 +65,10 @@ class Node1{
 }
 class HM{
    static Map<String,Node1> ID=new HashMap<>();
-   public void puts(String a,Node1 node){
+   public synchronized void puts(String a,Node1 node){
        ID.put(a,node);
    }
-   public Node1 gets(String a){
+   public synchronized Node1 gets(String a){
       return ID.get(a);
    }
    
@@ -72,7 +77,7 @@ class HM{
 
 public class GraphDAG1 {
    static Map<Node1,List<Node1>> map=new HashMap<>();
-   public void addVertex(Node1 s) 
+   public synchronized void addVertex(Node1 s) 
     { 
         map.put(s, new LinkedList<>()); 
     }
@@ -82,7 +87,7 @@ public class GraphDAG1 {
         }
         return 0;
     }
-   public void addEdge(Node1 source,Node1 destination){
+   public synchronized void addEdge(Node1 source,Node1 destination){
        try{
        if(!map.containsKey(source))
            addVertex(source);
@@ -136,7 +141,7 @@ public class GraphDAG1 {
     private static GraphDAG1 ConstructGraph(GraphDAG1 graph, String[] ContractQuiries,HM ID) throws InterruptedException,NullPointerException{
     String[] arr=ContractQuiries;
     GraphDAG1 x=graph;
-    Thread thread,thread1,thread2;
+    Thread thread = null,thread1,thread2;
     thread = new Thread(){
             @Override
             public void run(){
@@ -151,9 +156,17 @@ public class GraphDAG1 {
                     if(!"".equals(arr[k])){
                     String e=arr[k];
                     String[] edges=e.split(" ");
+                    Node1 a=ID.gets(edges[0]);
+                    Node1 b=ID.gets(edges[1]);
+                    if(x.getlock(a)==0 && x.getlock(b)==0){
+                    a.setLock(1);
+                    b.setLock(1);
                     graph.addEdge(ID.gets(edges[0]),ID.gets(edges[1]));
                     arr[k]="";
                     System.out.println("edge added:"+edges[0]+"->"+ edges[1]);
+                    a.setLock(0);
+                    b.setLock(0);
+                    }
                     }
                     c+=1;
                    }     
@@ -172,9 +185,17 @@ public class GraphDAG1 {
                    if(!"".equals(arr[k])){
                     String e=arr[k];
                     String[] edges=e.split(" ");
+                    Node1 a=ID.gets(edges[0]);
+                    Node1 b=ID.gets(edges[1]);
+                    if(x.getlock(a)==0 && x.getlock(b)==0){
+                    a.setLock(1);
+                    b.setLock(1);
                     graph.addEdge(ID.gets(edges[0]),ID.gets(edges[1]));
                     arr[k]="";
                     System.out.println("edge added:"+edges[0]+"->"+ edges[1]);
+                    a.setLock(0);
+                    b.setLock(0);
+                    }
 
                     }
                    c+=1;
@@ -194,10 +215,17 @@ public class GraphDAG1 {
                     if( !"".equals(arr[k])){
                     String e=arr[k];
                     String[] edges=e.split(" ");
+                    Node1 a=ID.gets(edges[0]);
+                    Node1 b=ID.gets(edges[1]);
+                    if(x.getlock(a)==0 && x.getlock(b)==0){
+                    a.setLock(1);
+                    b.setLock(1);
                     graph.addEdge(ID.gets(edges[0]),ID.gets(edges[1]));
                     arr[k]="";
                     System.out.println("edge added:"+edges[0]+"->"+ edges[1]);
-
+                    a.setLock(0);
+                    b.setLock(0);
+                    }
                     }
                     c+=1;
              }
@@ -211,4 +239,5 @@ public class GraphDAG1 {
   thread2.join();
     return x;
 }
+
 }
