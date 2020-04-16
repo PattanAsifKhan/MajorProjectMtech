@@ -1,0 +1,140 @@
+
+package graphdag;
+
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.*;
+import java.util.Map;
+
+class Node1{
+
+    public Node1(String c, int incoming, int outgoing, int amount) {
+        this.c = c;
+        this.incoming = incoming;
+        this.outgoing = outgoing;
+        this.amount = amount;
+    }
+
+    public String getC() {
+        return c;
+    }
+
+    public int getIncoming() {
+        return incoming;
+    }
+
+    public int getOutgoing() {
+        return outgoing;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public int getLock() {
+        return lock;
+    }
+    String c;
+
+    public void setIncoming(int incoming) {
+        this.incoming = incoming;
+    }
+
+    public void setOutgoing(int outgoing) {
+        this.outgoing = outgoing;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public void setLock(int lock) {
+        this.lock = lock;
+    }
+    int incoming;
+    int outgoing;
+    int amount;
+    int lock=0;
+}
+class HM{
+   static Map<String,Node1> ID=new HashMap<>();
+   public void puts(String a,Node1 node){
+       ID.put(a,node);
+   }
+   public Node1 gets(String a){
+      return ID.get(a);
+   }
+   
+}
+
+
+public class GraphDAG1 {
+   static Map<Node1,List<Node1>> map=new HashMap<>();
+   public void addVertex(Node1 s) 
+    { 
+        map.put(s, new LinkedList<>()); 
+    } 
+   public void addEdge(Node1 source,Node1 destination){
+       if(!map.containsKey(source))
+           addVertex(source);
+       if(!map.containsKey(destination))
+           addVertex(destination);
+       map.get(source).add(destination);
+       source.outgoing+=1;
+       destination.incoming+=1;
+       
+   }
+   public synchronized int getlock(Node1 A){
+        if(map.keySet().contains(A)){
+            A.lock=1;
+        }
+        return 0;
+    }
+   public static void print(GraphDAG1 g){
+       Iterator<Map.Entry<Node1,List<Node1>>> hm=map.entrySet().iterator();
+       while(hm.hasNext()){
+           Map.Entry<Node1,List<Node1>> entry=hm.next();
+           Node1 K=entry.getKey();
+           List<Node1> out=entry.getValue();
+           System.out.print(K.getC()+":");
+           for(int i=0;i<out.size();i++){
+               Node1 s=out.get(i);
+               System.out.print(s.getC()+" ");
+           }
+           System.out.println();
+       }
+       
+       
+   }
+       public  static void main(String[] Args){
+       GraphDAG1 graph=new GraphDAG1();
+       HM ID=new HM();
+       Node1 A=new Node1("A",0,0,1000);
+       ID.puts("A",A);
+       Node1 B=new Node1("B",0,0,500);
+       ID.puts("B",B);
+       Node1 C=new Node1("C",0,0,700);
+       ID.puts("C",C);
+       Node1 D=new Node1("D",0,0,800);
+       ID.puts("D",D);
+       Node1 E=new Node1("E",0,0,1100);
+       ID.puts("E",E);
+       Node1 F=new Node1("F",0,0,1050);
+       ID.puts("F",F);
+       String[] ContractQuiries={"A B","B C","D E","E F","C D","A C","F B"};
+       GraphDAG1 g=ConstructGraph(graph,ContractQuiries,ID);
+       print(g);
+       }
+
+    private static GraphDAG1 ConstructGraph(GraphDAG1 graph, String[] ContractQuiries,HM ID) {
+    String[] arr=ContractQuiries;
+    GraphDAG1 x=graph;
+    for(int i=0;i<arr.length;i++){
+    String[] k=arr[i].split(" ");
+    x.addEdge(ID.gets(k[0]),ID.gets(k[1]));
+    }
+    return x;
+}
+}
