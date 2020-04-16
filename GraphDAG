@@ -75,8 +75,15 @@ public class GraphDAG1 {
    public void addVertex(Node1 s) 
     { 
         map.put(s, new LinkedList<>()); 
-    } 
+    }
+    public synchronized int getlock(Node1 A){
+        if(map.keySet().contains(A)){
+            A.lock=1;
+        }
+        return 0;
+    }
    public void addEdge(Node1 source,Node1 destination){
+       try{
        if(!map.containsKey(source))
            addVertex(source);
        if(!map.containsKey(destination))
@@ -84,14 +91,12 @@ public class GraphDAG1 {
        map.get(source).add(destination);
        source.outgoing+=1;
        destination.incoming+=1;
+       }
+       catch(Exception e){
+           System.out.print("");
+       }
        
    }
-   public synchronized int getlock(Node1 A){
-        if(map.keySet().contains(A)){
-            A.lock=1;
-        }
-        return 0;
-    }
    public static void print(GraphDAG1 g){
        Iterator<Map.Entry<Node1,List<Node1>>> hm=map.entrySet().iterator();
        while(hm.hasNext()){
@@ -108,7 +113,7 @@ public class GraphDAG1 {
        
        
    }
-       public  static void main(String[] Args){
+       public  static void main(String[] Args) throws InterruptedException{
        GraphDAG1 graph=new GraphDAG1();
        HM ID=new HM();
        Node1 A=new Node1("A",0,0,1000);
@@ -128,13 +133,82 @@ public class GraphDAG1 {
        print(g);
        }
 
-    private static GraphDAG1 ConstructGraph(GraphDAG1 graph, String[] ContractQuiries,HM ID) {
+    private static GraphDAG1 ConstructGraph(GraphDAG1 graph, String[] ContractQuiries,HM ID) throws InterruptedException,NullPointerException{
     String[] arr=ContractQuiries;
     GraphDAG1 x=graph;
-    for(int i=0;i<arr.length;i++){
-    String[] k=arr[i].split(" ");
-    x.addEdge(ID.gets(k[0]),ID.gets(k[1]));
-    }
+    Thread thread,thread1,thread2;
+    thread = new Thread(){
+            @Override
+            public void run(){
+                    Random r= new Random();
+                    //int k =r.nextInt(7);
+                    int c=0;
+                   while(true){
+                    int k =r.nextInt(7); 
+                    if(c==10000){
+                        break;
+                    }
+                    if(!"".equals(arr[k])){
+                    String e=arr[k];
+                    String[] edges=e.split(" ");
+                    graph.addEdge(ID.gets(edges[0]),ID.gets(edges[1]));
+                    arr[k]="";
+                    System.out.println("edge added:"+edges[0]+"->"+ edges[1]);
+                    }
+                    c+=1;
+                   }     
+            }
+        };
+    thread1 = new Thread(){
+            @Override
+            public void run(){
+                    Random r= new Random();
+                    int c=0;
+                    while(true){
+                   int k =r.nextInt(7);
+                   if(c==10000){
+                        break;
+                    }
+                   if(!"".equals(arr[k])){
+                    String e=arr[k];
+                    String[] edges=e.split(" ");
+                    graph.addEdge(ID.gets(edges[0]),ID.gets(edges[1]));
+                    arr[k]="";
+                    System.out.println("edge added:"+edges[0]+"->"+ edges[1]);
+
+                    }
+                   c+=1;
+                    }
+            }
+        };
+        thread2 = new Thread(){
+            @Override
+            public void run(){
+                    Random r= new Random();
+                    int c=0;
+                    while(true){
+                        int k =r.nextInt(7);
+                        if(c==10000){
+                        break;
+                    }
+                    if( !"".equals(arr[k])){
+                    String e=arr[k];
+                    String[] edges=e.split(" ");
+                    graph.addEdge(ID.gets(edges[0]),ID.gets(edges[1]));
+                    arr[k]="";
+                    System.out.println("edge added:"+edges[0]+"->"+ edges[1]);
+
+                    }
+                    c+=1;
+             }
+            }
+        };
+  thread.start();
+  thread1.start();
+  thread2.start();
+  thread.join();
+  thread1.join();
+  thread2.join();
     return x;
 }
 }
