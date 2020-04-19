@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
- //Author Asif
 package graphdag1;
 
 import java.util.HashMap;
@@ -78,6 +77,31 @@ class HM{
 
 public class GraphDAG1 {
    static Map<Node1,List<Node1>> map=new HashMap<>();
+   static boolean global[]=new boolean[9];
+   public List<Node1> getNeighbours(Node1 a){
+       return map.get(a);
+   }
+
+    public static synchronized void  BFS( String x,GraphDAG1 g,HM ID,HashSet s) {
+        Queue<Node1> queue;
+       queue = new LinkedList<Node1>();
+       queue.add(ID.gets(x));
+       s.add(x);
+       while(!queue.isEmpty()){
+           Node1 curr=queue.remove();
+           List<Node1> neighbours=g.getNeighbours(curr);
+           for(int i=0;i<neighbours.size();i++){
+               neighbours.get(i).incoming-=1;
+               curr.outgoing-=1;
+               System.out.print("Transaction executed:"+curr.c+"-->"+neighbours.get(i).c);
+           }
+           for(int i=0;i<neighbours.size();i++){
+               queue.add(neighbours.get(i));
+               s.add(neighbours.get(i).c);
+           }
+       }
+       
+    }
    public synchronized void addVertex(Node1 s) 
     { 
         map.put(s, new LinkedList<>()); 
@@ -137,6 +161,8 @@ public class GraphDAG1 {
        String[] ContractQuiries={"A B","B C","D E","E F","C D","A C","F B"};
        GraphDAG1 g=ConstructGraph(graph,ContractQuiries,ID);
        print(g);
+       HashSet<Character> h=new HashSet<>();
+       BFS("B",g,ID,h);
        }
 
     private static GraphDAG1 ConstructGraph(GraphDAG1 graph, String[] ContractQuiries,HM ID) throws InterruptedException,NullPointerException{
