@@ -77,27 +77,33 @@ class HM{
 
 public class GraphDAG1 {
    static Map<Node1,List<Node1>> map=new HashMap<>();
-   static boolean global[]=new boolean[9];
-   public List<Node1> getNeighbours(Node1 a){
+   static HashSet<String> h=new HashSet<>();
+   static HashSet<String> h1=new HashSet<>();
+   public synchronized List<Node1> getNeighbours(Node1 a){
        return map.get(a);
    }
-
-    public static synchronized void  BFS( String x,GraphDAG1 g,HM ID,HashSet s) {
+   
+    public static synchronized void  BFS( String x,GraphDAG1 g,HM ID) {
         Queue<Node1> queue;
        queue = new LinkedList<Node1>();
        queue.add(ID.gets(x));
-       s.add(x);
-       while(!queue.isEmpty()){
+       h.add(x);
+       while(!queue.isEmpty() && h.size()>0){
            Node1 curr=queue.remove();
+           h.remove(curr.c);
+           h1.add(curr.c);
            List<Node1> neighbours=g.getNeighbours(curr);
-           for(int i=0;i<neighbours.size();i++){
+           int n=neighbours.size();
+           for(int i=0;i<n;i++){
                neighbours.get(i).incoming-=1;
                curr.outgoing-=1;
-               System.out.print("Transaction executed:"+curr.c+"-->"+neighbours.get(i).c);
+               System.out.println("Transaction executed:"+curr.c+"-->"+neighbours.get(i).c);
            }
            for(int i=0;i<neighbours.size();i++){
                queue.add(neighbours.get(i));
-               s.add(neighbours.get(i).c);
+               if(!h1.contains(neighbours.get(i).c)){
+               h.add(neighbours.get(i).c);
+           }    
            }
        }
        
@@ -150,19 +156,23 @@ public class GraphDAG1 {
        ID.puts("A",A);
        Node1 B=new Node1("B",0,0,500);
        ID.puts("B",B);
+       //check.put("B", Boolean.FALSE);
        Node1 C=new Node1("C",0,0,700);
        ID.puts("C",C);
+       //check.put("C", Boolean.FALSE);
        Node1 D=new Node1("D",0,0,800);
        ID.puts("D",D);
+       //check.put("D", Boolean.FALSE);
        Node1 E=new Node1("E",0,0,1100);
        ID.puts("E",E);
+       //check.put("E", Boolean.FALSE);
        Node1 F=new Node1("F",0,0,1050);
        ID.puts("F",F);
+       //check.put("F", Boolean.FALSE);
        String[] ContractQuiries={"A B","B C","D E","E F","C D","A C","F B"};
        GraphDAG1 g=ConstructGraph(graph,ContractQuiries,ID);
        print(g);
-       HashSet<Character> h=new HashSet<>();
-       BFS("B",g,ID,h);
+       BFS("B",g,ID);
        }
 
     private static GraphDAG1 ConstructGraph(GraphDAG1 graph, String[] ContractQuiries,HM ID) throws InterruptedException,NullPointerException{
@@ -266,5 +276,4 @@ public class GraphDAG1 {
   thread2.join();
     return x;
 }
-
 }
