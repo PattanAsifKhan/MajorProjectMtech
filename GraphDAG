@@ -81,7 +81,7 @@ public class GraphDAG1 {
    static HashSet<String> h1=new HashSet<>();
    static String[] participants={"A","B","C","D","E","F","G"};
 
-    public static void ParalellBFS(GraphDAG1 g, HM ID) throws InterruptedException {
+    public synchronized static void ParalellBFS(GraphDAG1 g, HM ID) throws InterruptedException {
       
        Thread t1,t2;
        t1 = new Thread(){
@@ -95,6 +95,7 @@ public class GraphDAG1 {
                    Node1 one=ID.gets(participants[k]);
                    if(one.incoming==0){
                        BFS(participants[k],g,ID);
+                       participants[k]="";
                        break;
                    }
                }
@@ -111,6 +112,7 @@ public class GraphDAG1 {
                    Node1 one=ID.gets(participants[k]);
                    if(one.incoming==0){
                        BFS(participants[k],g,ID);
+                       participants[k]="";
                        break;
                    }
                }
