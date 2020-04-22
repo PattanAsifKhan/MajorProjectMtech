@@ -5,6 +5,8 @@
  */
 package graphdag1;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,6 +82,7 @@ public class GraphDAG1 {
    static HashSet<String> h=new HashSet<>();
    static HashSet<String> h1=new HashSet<>();
    static String[] participants={"A","B","C","D","E","F","G"};
+   static int isset=0;
 
     public synchronized static void ParalellBFS(GraphDAG1 g, HM ID) throws InterruptedException {
       
@@ -94,8 +97,8 @@ public class GraphDAG1 {
                    System.out.println("t1"+participants[k]);
                    Node1 one=ID.gets(participants[k]);
                    if(one.incoming==0){
+                       //isset=1;
                        BFS(participants[k],g,ID);
-                       participants[k]="";
                        break;
                    }
                }
@@ -112,14 +115,13 @@ public class GraphDAG1 {
                    Node1 one=ID.gets(participants[k]);
                    if(one.incoming==0){
                        BFS(participants[k],g,ID);
-                       participants[k]="";
                        break;
                    }
                }
            }
        };
       t1.start();
-      t2.start();;
+      t2.start();
     }
    public synchronized List<Node1> getNeighbours(Node1 a){
        return map.get(a);
@@ -137,9 +139,11 @@ public class GraphDAG1 {
            List<Node1> neighbours=g.getNeighbours(curr);
            int n=neighbours.size();
            for(int i=0;i<n;i++){
+               if(neighbours.get(i).incoming>=1 &&  curr.outgoing>=1){
                neighbours.get(i).incoming-=1;
                curr.outgoing-=1;
                System.out.println("Transaction executed:"+curr.c+"-->"+neighbours.get(i).c);
+           }
            }
            for(int i=0;i<neighbours.size();i++){
                queue.add(neighbours.get(i));
@@ -213,12 +217,17 @@ public class GraphDAG1 {
        //check.put("F", Boolean.FALSE);
         Node1 G=new Node1("G",0,0,1050);
        ID.puts("G",G);
-       String[] ContractQuiries={"A B","B C","D E","E F","C D","A C","F B","G E"};
+       String[] ContractQuiries={"A B","B C","D E","E F","C D","C A","F B","G E"};
        GraphDAG1 g=ConstructGraph(graph,ContractQuiries,ID);
        print(g);
+       Instant start = Instant.now();
        //BFS("B",g,ID);
        ParalellBFS(g,ID);
-       System.out.print(E.incoming);
+       Instant finish = Instant.now();
+       
+       //ParalellBFS(g,ID);
+      long timeElapsed = Duration.between(start, finish).toNanos();
+       System.out.print(timeElapsed);
        }
 
     private static GraphDAG1 ConstructGraph(GraphDAG1 graph, String[] ContractQuiries,HM ID) throws InterruptedException,NullPointerException{
