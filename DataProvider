@@ -1,0 +1,30 @@
+
+package graphdag1;
+
+import java.util.Random;
+import java.util.*;
+
+public class DataProvider {
+    static String[] constant={"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O"};
+    public String[] getData(){
+        String[] ans=new String[1000];
+        int c=0;
+        HashSet<String> x=new HashSet<>();
+        Random r=new Random();
+        for(int i=0;i<1000;i++){
+            int k1=r.nextInt(15);
+            int k2=r.nextInt(15);
+            if(k1!=k2){
+                String a=constant[k1];
+                String b=constant[k2];
+                String res=a+" "+b;
+                if(x.contains(res)==false && x.contains(a+" "+b)==false ){
+                    x.add(res);
+                    ans[c++]=res;
+                }
+            }
+        }
+        return ans;
+    }
+    
+}
