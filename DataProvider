@@ -18,7 +18,8 @@ public class DataProvider {
                 String a=constant[k1];
                 String b=constant[k2];
                 String res=a+" "+b;
-                if(x.contains(res)==false && x.contains(a+" "+b)==false ){
+                String res1=b+" "+a;
+                if(x.contains(res)==false && x.contains(res1)==false ){
                     x.add(res);
                     ans[c++]=res;
                 }
