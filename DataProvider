@@ -24,7 +24,16 @@ public class DataProvider {
                 }
             }
         }
-        return ans;
+        int k=0;
+        for(int i=0;i<c;i++){
+         if(ans[i]!=null || ans[i]!=" ")
+         k+=1;
+        }
+        String[] na=new String[k];;
+        for(int i=0;i<k;i++){
+            na[i]=ans[i];
+        }
+        return na;
     }
     
 }
