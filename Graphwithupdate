@@ -1,0 +1,363 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package graphdag1;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.*;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+class Node1{
+
+    public Node1(String c, int incoming, int outgoing, int amount) {
+        this.c = c;
+        this.incoming = incoming;
+        this.outgoing = outgoing;
+        this.amount = amount;
+    }
+
+    public String getC() {
+        return c;
+    }
+
+    public int getIncoming() {
+        return incoming;
+    }
+
+    public int getOutgoing() {
+        return outgoing;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public synchronized int getLock() {
+        return lock;
+    }
+    String c;
+
+    public void setIncoming(int incoming) {
+        this.incoming = incoming;
+    }
+
+    public void setOutgoing(int outgoing) {
+        this.outgoing = outgoing;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public synchronized void setLock(int lock) {
+        this.lock = lock;
+    }
+    int incoming;
+    int outgoing;
+    int amount;
+    int lock=0;
+}
+class HM{
+   static Map<String,Node1> ID=new HashMap<>();
+   public synchronized void puts(String a,Node1 node){
+       ID.put(a,node);
+   }
+   public synchronized Node1 gets(String a){
+      return ID.get(a);
+   }
+   
+}
+
+
+public class GraphDAG1 {
+   static Map<Node1,List<Node1>> map=new HashMap<>();
+   static HashSet<String> h=new HashSet<>();
+   static HashSet<String> h1=new HashSet<>();
+   static String[] participants={"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q"};
+    static DataProvider d=new DataProvider();
+   static int isset=0;
+
+    public synchronized static void ParalellBFS(GraphDAG1 g, HM ID) throws InterruptedException {
+      
+       Thread t1,t2;
+       t1 = new Thread(){
+           @Override
+           public void run()
+           {
+              Random r=new Random();
+               while(true){
+                   int k=r.nextInt(7);
+                   System.out.println("t1"+participants[k]);
+                   Node1 one=ID.gets(participants[k]);
+                   if(one.incoming==0){
+                       //isset=1;
+                       BFS(participants[k],g,ID);
+                       break;
+                   }
+               }
+           }
+       };
+           t2 = new Thread(){
+           @Override
+           public void run()
+           {
+              Random r=new Random();
+               while(true){
+                   int k=r.nextInt(7);
+                   System.out.println("t2"+participants[k]);
+                   Node1 one=ID.gets(participants[k]);
+                   if(one.incoming==0){
+                       BFS(participants[k],g,ID);
+                       break;
+                   }
+               }
+           }
+       };
+      t1.start();
+      t2.start();
+    }
+   public synchronized List<Node1> getNeighbours(Node1 a){
+       return map.get(a);
+   }
+   
+    public static synchronized void  BFS( String x,GraphDAG1 g,HM ID) {
+        Queue<Node1> queue;
+       queue = new LinkedList<Node1>();
+       queue.add(ID.gets(x));
+       h.add(x);
+       while(!queue.isEmpty() && h.size()>0){
+           Node1 curr=queue.remove();
+           h.remove(curr.c);
+           h1.add(curr.c);
+           List<Node1> neighbours=g.getNeighbours(curr);
+           int n=neighbours.size();
+           for(int i=0;i<n;i++){
+               if(neighbours.get(i).incoming>=1 &&  curr.outgoing>=1){
+               neighbours.get(i).incoming-=1;
+               curr.outgoing-=1;
+               System.out.println("Transaction executed:"+curr.c+"-->"+neighbours.get(i).c);
+           }
+           }
+           for(int i=0;i<neighbours.size();i++){
+               queue.add(neighbours.get(i));
+               if(!h1.contains(neighbours.get(i).c)){
+               h.add(neighbours.get(i).c);
+           }    
+           }
+       }
+       
+    }
+   public synchronized void addVertex(Node1 s) 
+    { 
+        map.put(s, new LinkedList<>()); 
+    }
+    public synchronized int getlock(Node1 A){
+        if(map.keySet().contains(A)){
+            A.lock=1;
+        }
+        return 0;
+    }
+   public synchronized void addEdge(Node1 source,Node1 destination){
+       try{
+       if(!map.containsKey(source))
+           addVertex(source);
+       if(!map.containsKey(destination))
+           addVertex(destination);
+       map.get(source).add(destination);
+       source.outgoing+=1;
+       destination.incoming+=1;
+       }
+       catch(Exception e){
+           System.out.print("");
+       }
+       
+   }
+   public static void print(GraphDAG1 g){
+       Iterator<Map.Entry<Node1,List<Node1>>> hm=map.entrySet().iterator();
+       while(hm.hasNext()){
+           Map.Entry<Node1,List<Node1>> entry=hm.next();
+           Node1 K=entry.getKey();
+           List<Node1> out=entry.getValue();
+           System.out.print(K.getC()+":");
+           for(int i=0;i<out.size();i++){
+               Node1 s=out.get(i);
+               System.out.print(s.getC()+" ");
+           }
+           System.out.println();
+       }
+       
+       
+   }
+       public  static void main(String[] Args) throws InterruptedException{
+       GraphDAG1 graph=new GraphDAG1();
+       HM ID=new HM();
+       Node1 A=new Node1("A",0,0,1000);
+       ID.puts("A",A);
+       Node1 B=new Node1("B",0,0,500);
+       ID.puts("B",B);
+       //check.put("B", Boolean.FALSE);
+       Node1 C=new Node1("C",0,0,700);
+       ID.puts("C",C);
+       //check.put("C", Boolean.FALSE);
+       Node1 D=new Node1("D",0,0,800);
+       ID.puts("D",D);
+       //check.put("D", Boolean.FALSE);
+       Node1 E=new Node1("E",0,0,1100);
+       ID.puts("E",E);
+       //check.put("E", Boolean.FALSE);
+       Node1 F=new Node1("F",0,0,1050);
+       ID.puts("F",F);
+       //check.put("F", Boolean.FALSE);
+        Node1 G=new Node1("G",0,0,1050);
+       ID.puts("G",G);
+       Node1 H=new Node1("H",0,0,1000);
+       ID.puts("H",H);
+       Node1 I=new Node1("I",0,0,500);
+       ID.puts("I",I);
+       //check.put("B", Boolean.FALSE);
+       Node1 J=new Node1("J",0,0,700);
+       ID.puts("J",J);
+       //check.put("C", Boolean.FALSE);
+       Node1 K=new Node1("K",0,0,800);
+       ID.puts("K",K);
+       //check.put("D", Boolean.FALSE);
+       Node1 L=new Node1("L",0,0,1100);
+       ID.puts("L",L);
+       //check.put("E", Boolean.FALSE);
+       Node1 M=new Node1("M",0,0,1050);
+       ID.puts("M",M);
+       //check.put("F", Boolean.FALSE);
+        Node1 N=new Node1("N",0,0,1050);
+       ID.puts("N",N);
+        Node1 O=new Node1("O",0,0,1100);
+       ID.puts("O",O);
+       //check.put("E", Boolean.FALSE);
+       Node1 P=new Node1("P",0,0,1050);
+       ID.puts("P",P);
+       //check.put("F", Boolean.FALSE);
+        Node1 Q=new Node1("Q",0,0,1050);
+       ID.puts("Q",Q);
+       String[] ContractQuiries=d.getData();
+       GraphDAG1 g=ConstructGraph(graph,ContractQuiries,ID);
+       print(g);
+       Instant start = Instant.now();
+       //BFS("B",g,ID);
+       //ParalellBFS(g,ID);
+       Instant finish = Instant.now();
+       
+       //ParalellBFS(g,ID);
+      long timeElapsed = Duration.between(start, finish).toNanos();
+       System.out.print(timeElapsed);
+       }
+
+    private static GraphDAG1 ConstructGraph(GraphDAG1 graph, String[] ContractQuiries,HM ID) throws InterruptedException,NullPointerException{
+    String[] arr=ContractQuiries;
+    GraphDAG1 x=graph;
+    int n=ContractQuiries.length;
+    Thread thread,thread1,thread2;
+    thread = new Thread(){
+            @Override
+            public void run(){
+                    Random r= new Random();
+                    //int k =r.nextInt(7);
+                    int c=0;
+                   while(true){
+                    int k =r.nextInt(n); 
+                    if(c==10000){
+                        break;
+                    }
+                    if(!"".equals(arr[k])){
+                    String e=arr[k];
+                    String[] edges=e.split(" ");
+                    Node1 a=ID.gets(edges[0]);
+                    Node1 b=ID.gets(edges[1]);
+                    if(x.getlock(a)==0 && x.getlock(b)==0){
+                    a.setLock(1);
+                    b.setLock(1);
+                    graph.addEdge(ID.gets(edges[0]),ID.gets(edges[1]));
+                    arr[k]="";
+                    System.out.println("edge added:"+edges[0]+"->"+ edges[1]);
+                    a.setLock(0);
+                    b.setLock(0);
+                    }
+                    }
+                    c+=1;
+                   }     
+            }
+        };
+    thread1 = new Thread(){
+            @Override
+            public void run(){
+                    Random r= new Random();
+                    int c=0;
+                    while(true){
+                   int k =r.nextInt(n);
+                   if(c==10000){
+                        break;
+                    }
+                   if(!"".equals(arr[k])){
+                    String e=arr[k];
+                    String[] edges=e.split(" ");
+                    Node1 a=ID.gets(edges[0]);
+                    Node1 b=ID.gets(edges[1]);
+                    if(x.getlock(a)==0 && x.getlock(b)==0){
+                    a.setLock(1);
+                    b.setLock(1);
+                    graph.addEdge(ID.gets(edges[0]),ID.gets(edges[1]));
+                    arr[k]="";
+                    System.out.println("edge added:"+edges[0]+"->"+ edges[1]);
+                    a.setLock(0);
+                    b.setLock(0);
+                    }
+
+                    }
+                   c+=1;
+                    }
+            }
+        };
+        thread2 = new Thread(){
+            @Override
+            public void run(){
+                    Random r= new Random();
+                    int c=0;
+                    while(true){
+                        int k =r.nextInt(n);
+                        if(c==10000){
+                        break;
+                    }
+                    if( !"".equals(arr[k])){
+                    String e=arr[k];
+                    String[] edges=e.split(" ");
+                    Node1 a=ID.gets(edges[0]);
+                    Node1 b=ID.gets(edges[1]);
+                    if(x.getlock(a)==0 && x.getlock(b)==0){
+                    a.setLock(1);
+                    b.setLock(1);
+                    graph.addEdge(ID.gets(edges[0]),ID.gets(edges[1]));
+                    arr[k]="";
+                    System.out.println("edge added:"+edges[0]+"->"+ edges[1]);
+                    a.setLock(0);
+                    b.setLock(0);
+                    }
+                    }
+                    c+=1;
+             }
+            }
+        };
+  thread.start();
+  thread1.start();
+  thread2.start();
+  thread.join();
+  thread1.join();
+  thread2.join();
+    return x;
+}
+}
