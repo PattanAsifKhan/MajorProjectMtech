@@ -81,7 +81,8 @@ public class GraphDAG1 {
    static Map<Node1,List<Node1>> map=new HashMap<>();
    static HashSet<String> h=new HashSet<>();
    static HashSet<String> h1=new HashSet<>();
-   static String[] participants={"A","B","C","D","E","F","G"};
+   static String[] participants={"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R"};
+    static DataProvider d=new DataProvider();
    static int isset=0;
 
     public synchronized static void ParalellBFS(GraphDAG1 g, HM ID) throws InterruptedException {
@@ -93,7 +94,7 @@ public class GraphDAG1 {
            {
               Random r=new Random();
                while(true){
-                   int k=r.nextInt(7);
+                   int k=r.nextInt(18);
                    System.out.println("t1"+participants[k]);
                    Node1 one=ID.gets(participants[k]);
                    if(one.incoming==0){
@@ -110,7 +111,7 @@ public class GraphDAG1 {
            {
               Random r=new Random();
                while(true){
-                   int k=r.nextInt(7);
+                   int k=r.nextInt(18);
                    System.out.println("t2"+participants[k]);
                    Node1 one=ID.gets(participants[k]);
                    if(one.incoming==0){
@@ -217,22 +218,52 @@ public class GraphDAG1 {
        //check.put("F", Boolean.FALSE);
         Node1 G=new Node1("G",0,0,1050);
        ID.puts("G",G);
-       String[] ContractQuiries={"A B","B C","D E","E F","C D","C A","F B","G E"};
+       Node1 H=new Node1("H",0,0,1000);
+       ID.puts("H",H);
+       Node1 I=new Node1("I",0,0,500);
+       ID.puts("I",I);
+       //check.put("B", Boolean.FALSE);
+       Node1 J=new Node1("J",0,0,700);
+       ID.puts("J",J);
+       //check.put("C", Boolean.FALSE);
+       Node1 K=new Node1("K",0,0,800);
+       ID.puts("K",K);
+       //check.put("D", Boolean.FALSE);
+       Node1 L=new Node1("L",0,0,1100);
+       ID.puts("L",L);
+       //check.put("E", Boolean.FALSE);
+       Node1 M=new Node1("M",0,0,1050);
+       ID.puts("M",M);
+       //check.put("F", Boolean.FALSE);
+        Node1 N=new Node1("N",0,0,1050);
+       ID.puts("N",N);
+        Node1 O=new Node1("O",0,0,1100);
+       ID.puts("O",O);
+       //check.put("E", Boolean.FALSE);
+       Node1 P=new Node1("P",0,0,1050);
+       ID.puts("P",P);
+       //check.put("F", Boolean.FALSE);
+        Node1 Q=new Node1("Q",0,0,1050);
+       ID.puts("Q",Q);
+       Node1 R=new Node1("R",0,0,1050);
+       ID.puts("R",Q);
+       String[] ContractQuiries=d.getData();
        GraphDAG1 g=ConstructGraph(graph,ContractQuiries,ID);
        print(g);
        Instant start = Instant.now();
-       //BFS("B",g,ID);
-       ParalellBFS(g,ID);
+       BFS("B",g,ID);
+       //ParalellBFS(g,ID);
        Instant finish = Instant.now();
        
        //ParalellBFS(g,ID);
       long timeElapsed = Duration.between(start, finish).toNanos();
-       System.out.print(timeElapsed);
+       System.out.print("Total time taken for BFS:"+timeElapsed);
        }
 
     private static GraphDAG1 ConstructGraph(GraphDAG1 graph, String[] ContractQuiries,HM ID) throws InterruptedException,NullPointerException{
     String[] arr=ContractQuiries;
     GraphDAG1 x=graph;
+    int n=ContractQuiries.length;
     Thread thread,thread1,thread2;
     thread = new Thread(){
             @Override
@@ -241,7 +272,7 @@ public class GraphDAG1 {
                     //int k =r.nextInt(7);
                     int c=0;
                    while(true){
-                    int k =r.nextInt(8); 
+                    int k =r.nextInt(n); 
                     if(c==10000){
                         break;
                     }
@@ -270,7 +301,7 @@ public class GraphDAG1 {
                     Random r= new Random();
                     int c=0;
                     while(true){
-                   int k =r.nextInt(8);
+                   int k =r.nextInt(n);
                    if(c==10000){
                         break;
                     }
@@ -300,7 +331,7 @@ public class GraphDAG1 {
                     Random r= new Random();
                     int c=0;
                     while(true){
-                        int k =r.nextInt(8);
+                        int k =r.nextInt(n);
                         if(c==10000){
                         break;
                     }
