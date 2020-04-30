@@ -1,0 +1,47 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package graphdag1;
+
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ *
+ * @author hp
+ */
+public class BFSCycleandPQ {
+    public boolean findcycle(int V,GraphDAG1 g,String[] participants,HM ID){
+        boolean[] visited = new boolean[V]; 
+        boolean[] recStack = new boolean[V]; 
+        for(int i=1;i<V;i++){
+         if (isCyclicUtil(g,participants[i], visited, recStack,ID)==true)
+             return true;
+        }
+        return false;
+    }
+
+    private boolean isCyclicUtil(GraphDAG1 g,String a, boolean[] visited, boolean[] recStack,HM ID) {
+         if (recStack[a.charAt(0)-65]) 
+            return true; 
+  
+        if (visited[a.charAt(0)-65]) 
+            return false; 
+              
+        visited[a.charAt(0)-65] = true; 
+  
+        recStack[a.charAt(0)-65] = true; 
+        List<Node1> children = g.getNeighbours(ID.gets(a)); 
+          
+        for (Node1 c: children) 
+            if (isCyclicUtil(g,c.getC(), visited, recStack,ID)) 
+                return true; 
+                  
+        recStack[a.charAt(0)-65] = false; 
+  
+        return false;
+    }
+    
+}
