@@ -111,7 +111,14 @@ public class BFSCycleandPQ {
         MinHeap heap=new MinHeap();
         int[] order=heap.heapify(arr2);
         for(int i=0;i<order.length;i++){
-            System.out.print(order[i]);
+            System.out.println("Order of Transaction"+i+" "+order[i]);
+           int v=order[i];
+           int j=0;
+           while(Quiries[j].charAt(0)+'\0' - 48-v!=0){
+               j++;
+           }
+           System.out.print("Transaction in Cycle Executed"+Quiries[j].charAt(2)+"-->"+Quiries[j].charAt(4));
         }
-    }   
+    }
+   
 }
