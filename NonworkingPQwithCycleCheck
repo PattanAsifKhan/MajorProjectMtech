@@ -5,6 +5,7 @@
  */
 package graphdag1;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -79,7 +80,8 @@ public class BFSCycleandPQ {
            }
        }
         //System.out.print(Quiries[0]);
-        int[] arr=new int[c];
+        //int[] arr=new int[c];
+        List<Integer> arr=new ArrayList<>();
         for(int i=0;i<c;i++){
             if(stack[i]==true){
                String findt=participants[i];
@@ -88,16 +90,26 @@ public class BFSCycleandPQ {
                int k=0;
                while(j<Quiries.length){
                    if(Quiries[j].charAt(2)==a){
-                       //System.out.print(Quiries[j]);
-                       arr[k++]=(int)Quiries[j].charAt(2);
-                       System.out.println(arr[k]);
+                       //System.out.println(Quiries[j].charAt(0));
+                       int x=(int)Quiries[j].charAt(0)+'\0' - 48;
+                       arr.add(x);
+                       System.out.println(x);
+                       System.out.println(arr);
                    }
                    j++;
                } 
             }
         }
+        for(int i=0;i<arr.size();i++){
+            System.out.println(arr.get(i));
+        }
+        int arr2[]=new int[arr.size()];
+        int k=0;
+        for(Integer i :arr){
+            arr2[k++]=i;
+        }
         MinHeap heap=new MinHeap();
-        int[] order=heap.heapify(arr);
+        int[] order=heap.heapify(arr2);
         for(int i=0;i<order.length;i++){
             System.out.print(order[i]);
         }
