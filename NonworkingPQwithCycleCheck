@@ -1,0 +1,105 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package graphdag1;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.PriorityQueue;
+
+/**
+ *
+ * @author hp
+ */
+class MinHeap{
+    int[] heapify(int[] arr){
+        PriorityQueue<Integer> priorityQueue = new PriorityQueue<>();
+        int[] order=new int[arr.length];
+        for(int i=0;i<arr.length;i++){
+            priorityQueue.add(arr[i]);
+        }
+        for(int i=0;i<arr.length;i++){
+            order[i]=priorityQueue.poll();
+        }
+        return order;
+    }
+}
+public class BFSCycleandPQ {
+    public boolean findcycle(int V,GraphDAG1 g,String[] participants,HM ID,String[] Quiries){
+        System.out.println(Quiries[0]);
+        boolean[] visited = new boolean[V]; 
+        boolean[] recStack = new boolean[V]; 
+        for(int i=1;i<V;i++){
+         if (isCyclicUtil(g,participants[i], visited, recStack,ID)==true){
+             brakecycle(g, participants[i], recStack,participants,ID,Quiries);
+             return true;
+         }
+        }
+        return false;
+    }
+
+    public boolean isCyclicUtil(GraphDAG1 g,String a, boolean[] visited, boolean[] recStack,HM ID) {
+         if (recStack[a.charAt(0)-65]) 
+            return true; 
+  
+        if (visited[a.charAt(0)-65]) 
+            return false; 
+              
+        visited[a.charAt(0)-65] = true; 
+  
+        recStack[a.charAt(0)-65] = true; 
+        List<Node1> children = g.getNeighbours(ID.gets(a)); 
+          
+        for (Node1 c: children) 
+            if (isCyclicUtil(g,c.getC(), visited, recStack,ID)){
+                //brakecycle(g,c.getC(),recStack);
+                return true; 
+            }
+                  
+        recStack[a.charAt(0)-65] = false; 
+  
+        return false;
+    }
+    /*public void print(String[] Quiries){
+        for(int i=0;i<Quiries.length;i++){
+            System.out.print(Quiries[i]);
+        }
+    }*/
+   
+    
+    
+    public void brakecycle(GraphDAG1 g,String C,boolean[] stack,String[] participants,HM ID,String[] Quiries) {
+       int c=0;
+        for(int i=0;i<stack.length;i++){
+           if(stack[i]==true){
+             List<Node1> a=g.getNeighbours(ID.gets(participants[i]));
+               c+=a.size();
+           }
+       }
+        //System.out.print(Quiries[0]);
+        int[] arr=new int[c];
+        for(int i=0;i<c;i++){
+            if(stack[i]==true){
+               String findt=participants[i];
+               char a=findt.charAt(0);
+               int j=0;
+               int k=0;
+               while(j<Quiries.length){
+                   if(Quiries[j].charAt(2)==a){
+                       //System.out.print(Quiries[j]);
+                       arr[k++]=(int)Quiries[j].charAt(2);
+                       System.out.println(arr[k]);
+                   }
+                   j++;
+               } 
+            }
+        }
+        MinHeap heap=new MinHeap();
+        int[] order=heap.heapify(arr);
+        for(int i=0;i<order.length;i++){
+            System.out.print(order[i]);
+        }
+    }   
+}
