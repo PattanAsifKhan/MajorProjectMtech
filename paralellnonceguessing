@@ -1,0 +1,120 @@
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Random;
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/**
+ *
+ * @author hp
+ */
+public class Nonceguessing {
+    static boolean f=false;
+    static Random random=new Random();
+    public static void main(String[] args) throws InterruptedException{
+        Instant start = Instant.now();
+        int r=(int)(Math.random()*50000);
+        System.out.println(r);
+        Thread t0=new Thread(){
+            public void run(){
+                while(f!=true){
+                   int k=(int)(Math.random()*(20000-0)+0);
+                    System.out.println(k);
+                    if(k==r){
+                        f=true;
+                        System.out.println("thread0 found this");
+                        break;
+                    }
+                }
+            }
+        };
+        Thread t1=new Thread(){
+            public void run(){
+                while(f!=true){
+                    int k=(int)(Math.random()*(40000-20000)+20000);
+                    System.out.println(k);
+                    if(k==r){
+                        f=true;
+                        System.out.print("thread1 found this");
+                        break;
+                    }
+                }
+            }
+        };
+        Thread t2=new Thread(){
+            public void run(){
+                while(f!=true){
+                    int k=(int)(Math.random()*(60000-40000)+40000);
+                    if(k==r){
+                        f=true;
+                        System.out.println("thread2 found this");
+                        break;
+                    }
+                }
+            }
+        };Thread t3=new Thread(){
+            public void run(){
+                while(f!=true){
+                    int k=(int)(Math.random()*(80000-60000)+60000);
+                    System.out.println(k);
+                    if(k==r){
+                        f=true;
+                        System.out.print("thread3 found this");
+                        break;
+                    }
+                }
+            }
+        };Thread t4=new Thread(){
+            public void run(){
+                while(f!=true){
+                    int k=(int)(Math.random()*(100000-20000)+80000);
+                    if(k==r){
+                        f=true;
+                        System.out.println("thread4 found this");
+                        break;
+                    }
+                }
+            }
+        };
+        /*Thread t5=new Thread(){
+            public void run(){
+                while(f!=true){
+                    Random random=new Random();
+                    int k=random.nextInt(10000);
+                    if(k==r){
+                        f=true;
+                        System.out.print("thread5 found this");
+                        break;
+                    }
+                }
+            }
+        };*/
+        t0.start();
+        t1.start();
+        t2.start();
+        t3.start();
+        t4.start();
+        t0.join();
+        t1.join();
+        t2.join();
+        t3.join();
+        t4.join();
+        Instant finish = Instant.now();
+        long timeElapsed = Duration.between(start, finish).toNanos();
+        System.out.println("paralell:"+timeElapsed);
+        Instant s = Instant.now();
+        for(int i=0;i<100000000;i++){
+            if(i==r){
+                System.out.println(i);
+            }
+        }
+      Instant e = Instant.now();
+      long timeEl = Duration.between(s, e).toNanos();
+      System.out.println("Sequential"+timeEl);
+    }
+}
